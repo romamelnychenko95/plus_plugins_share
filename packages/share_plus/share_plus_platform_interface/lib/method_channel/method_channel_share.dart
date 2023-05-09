@@ -160,6 +160,30 @@ class MethodChannelShare extends SharePlatform {
     );
   }
 
+  @override
+  Future<void> shareUrl(
+    Uri url, {
+    String? subject,
+    String? text,
+    Rect? sharePositionOrigin,
+  }) async {
+    assert(text?.isNotEmpty ?? false);
+    final params = <String, dynamic>{
+      'text': text,
+      'subject': subject,
+      'url': url.toString(),
+    };
+
+    if (sharePositionOrigin != null) {
+      params['originX'] = sharePositionOrigin.left;
+      params['originY'] = sharePositionOrigin.top;
+      params['originWidth'] = sharePositionOrigin.width;
+      params['originHeight'] = sharePositionOrigin.height;
+    }
+
+    return channel.invokeMethod<void>('shareUrl', params);
+  }
+
   /// if file doesn't contain path
   /// then make new file in TemporaryDirectory and return with path
   ///

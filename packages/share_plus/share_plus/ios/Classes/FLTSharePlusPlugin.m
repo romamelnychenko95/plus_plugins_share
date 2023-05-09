@@ -88,6 +88,11 @@ TopViewControllerForViewController(UIViewController *viewController) {
 @property(readonly, nonatomic, copy) NSString *text;
 @property(readonly, nonatomic, copy) NSString *path;
 @property(readonly, nonatomic, copy) NSString *mimeType;
+@property(readonly, nonatomic, copy) NSString *urlString;
+
+- (instancetype)initWithUrl:(NSString *)urlString
+                    subject:(NSString *)subject
+                       text:(NSString *)text NS_DESIGNATED_INITIALIZER;
 
 - (instancetype)initWithSubject:(NSString *)subject
                            text:(NSString *)text NS_DESIGNATED_INITIALIZER;
@@ -109,6 +114,18 @@ TopViewControllerForViewController(UIViewController *viewController) {
 - (instancetype)init {
   [super doesNotRecognizeSelector:_cmd];
   return nil;
+}
+
+- (instancetype)initWithUrl:(NSString *)urlString
+                    subject:(NSString *)subject
+                       text:(NSString *)text {
+  self = [super init];
+  if (self) {
+    _subject = [subject isKindOfClass:NSNull.class] ? @"" : subject;
+    _text = text;
+    _urlString = urlString;
+  }
+  return self;
 }
 
 - (instancetype)initWithSubject:(NSString *)subject text:(NSString *)text {
@@ -203,6 +220,14 @@ TopViewControllerForViewController(UIViewController *viewController) {
     metadata.title = _subject;
   } else if ([_text length] > 0) {
     metadata.title = _text;
+  }
+
+  if (_urlString) {
+    metadata.originalURL = [NSURL URLWithString:_urlString];
+      
+    UIImage *appIcon = [UIImage imageNamed:[[NSBundle mainBundle].infoDictionary[@"CFBundleIcons"][@"CFBundlePrimaryIcon"][@"CFBundleIconFiles"] firstObject]];
+    metadata.imageProvider = [[NSItemProvider alloc]
+                              initWithObject:appIcon];
   }
 
   if (_path) {
@@ -334,10 +359,58 @@ TopViewControllerForViewController(UIViewController *viewController) {
                   withResult:withResult];
           if (!withResult)
             result(nil);
+        } else if ([@"shareUrl" isEqualToString:call.method]) {
+          NSString *url = arguments[@"url"];
+          NSString *subject = arguments[@"subject"];
+          NSString *text = arguments[@"text"];
+
+          if (url.length == 0) {
+            result([FlutterError errorWithCode:@"error"
+                                       message:@"Url required"
+                                       details:nil]);
+            return;
+          }
+
+          UIViewController *rootViewController = RootViewController();
+          if (!rootViewController) {
+            result([FlutterError errorWithCode:@"error"
+                                       message:@"No root view controller found"
+                                       details:nil]);
+            return;
+          }
+          UIViewController *topViewController =
+              TopViewControllerForViewController(rootViewController);
+          [self shareUrl:url
+                    text:text
+                 subject:subject
+          withController:topViewController
+                atSource:originRect
+                toResult:result
+              withResult:withResult];
+          if (!withResult)
+            result(nil);
         } else {
           result(FlutterMethodNotImplemented);
         }
       }];
+}
+
++ (void)shareUrl:(NSString*)urlString
+            text:(NSString *)shareText
+         subject:(NSString *)subject
+  withController:(UIViewController *)controller
+        atSource:(CGRect)origin
+        toResult:(FlutterResult)result
+      withResult:(BOOL)withResult {
+  NSObject *data = [[SharePlusData alloc] initWithUrl:urlString
+                                              subject:(NSString *)subject
+                                                 text:(NSString *)shareText];
+  [self share:@[ data ]
+         withSubject:subject
+      withController:controller
+            atSource:origin
+            toResult:result
+          withResult:withResult];
 }
 
 + (void)share:(NSArray *)shareItems

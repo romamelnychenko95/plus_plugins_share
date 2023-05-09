@@ -193,9 +193,11 @@ class DemoAppState extends State<DemoApp> {
           subject: subject,
           sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size);
     } else {
-      await Share.share(text,
-          subject: subject,
-          sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size);
+      // await Share.share(text,
+      //     subject: subject,
+      //     sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size);
+      await Share.shareUrl(Uri.parse('https://www.google.com/'),
+          text: 'Bla bla bla https://www.google.com/', subject: 'la la la la');
     }
   }
 

@@ -111,6 +111,21 @@ class SharePlatform extends PlatformInterface {
       sharePositionOrigin: sharePositionOrigin,
     );
   }
+
+  Future<void> shareUrl(
+    Uri url, {
+    String? subject,
+    String? text,
+    Rect? sharePositionOrigin,
+  }) async {
+    assert(url.toString().isNotEmpty);
+    return _instance.shareUrl(
+      url,
+      subject: subject,
+      text: text,
+      sharePositionOrigin: sharePositionOrigin,
+    );
+  }
 }
 
 /// The result of a share to determine what action the

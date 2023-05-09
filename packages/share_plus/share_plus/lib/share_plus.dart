@@ -189,4 +189,19 @@ class Share {
       sharePositionOrigin: sharePositionOrigin,
     );
   }
+
+  static Future<void> shareUrl(
+    Uri url, {
+    String? subject,
+    String? text,
+    Rect? sharePositionOrigin,
+  }) async {
+    assert(url.toString().isNotEmpty);
+    return _platform.shareUrl(
+      url,
+      subject: subject,
+      text: text,
+      sharePositionOrigin: sharePositionOrigin,
+    );
+  }
 }
