@@ -1,10 +1,14 @@
 name: share_plus_example
 description: Demonstrates how to use the share_plus plugin.
+version: 1.0.0+7
+
+publish_to: none
 
 dependencies:
   flutter:
     sdk: flutter
-  share_plus: ^7.0.0
+  share_plus: 
+    path: /Users/mymac/Documents/Flutter/plus_plugins_share/packages/share_plus/share_plus
   image_picker: ^0.8.7+4
   file_selector: ^0.9.2+4
 
